@@ -1,0 +1,38 @@
+[
+  {
+    "id": "TR-1042",
+    "name": "Sarah Jenkins",
+    "specialty": "HIIT / Strength",
+    "branch": "Downtown",
+    "email": "s.jenkins@titanfitness.com",
+    "phone": "+1 (555) 019-4471",
+    "isActive": true
+  },
+  {
+    "id": "TR-1043",
+    "name": "Marcus Lee",
+    "specialty": "Yoga / Mobility",
+    "branch": "Downtown",
+    "email": "m.lee@titanfitness.com",
+    "phone": "+1 (555) 019-5520",
+    "isActive": true
+  },
+  {
+    "id": "TR-1044",
+    "name": "Elena Rodriguez",
+    "specialty": "Cycling",
+    "branch": "Uptown",
+    "email": "e.rodriguez@titanfitness.com",
+    "phone": "+1 (555) 019-7783",
+    "isActive": true
+  },
+  {
+    "id": "TR-1045",
+    "name": "Mike Torres",
+    "specialty": "Pilates",
+    "branch": "Uptown",
+    "email": "m.torres@titanfitness.com",
+    "phone": "",
+    "isActive": false
+  }
+]
