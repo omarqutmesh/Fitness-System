@@ -1,0 +1,117 @@
+<div class="dialog-backdrop" (click)="closed.emit()"></div>
+<div class="dialog-box card">
+  <div class="card-header-row">
+    <h5 class="mb-0">{{ title() }}</h5>
+    <button type="button" class="btn-close" (click)="closed.emit()"></button>
+  </div>
+
+  <div class="dialog-body">
+    @for (f of filters(); track f.key) {
+      <div class="mb-3">
+        <label class="form-label fw-semibold">{{ f.label }}</label>
+
+        @switch (f.type) {
+          @case ('multi') {
+            <input
+              type="search"
+              class="form-control form-control-sm mb-2"
+              placeholder="Type to search..."
+              [appAutofocus]="$first"
+              [ngModel]="search()[f.key] ?? ''"
+              (ngModelChange)="setSearch(f.key, $event)"
+            />
+            <div class="option-list">
+              @for (o of visible(f); track o) {
+                <label class="check-line">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    [checked]="has(f.key, o)"
+                    (change)="toggle(f.key, o)"
+                  />
+                  {{ o }}
+                </label>
+              } @empty {
+                <small class="text-muted">No matches.</small>
+              }
+            </div>
+          }
+          @case ('checks') {
+            <div class="d-flex flex-wrap gap-3">
+              @for (o of f.options; track o) {
+                <label class="check-line">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    [checked]="has(f.key, o)"
+                    (change)="toggle(f.key, o)"
+                  />
+                  {{ o }}
+                </label>
+              }
+            </div>
+          }
+          @case ('radio') {
+            <div class="d-flex flex-wrap gap-3">
+              @for (o of f.options; track o) {
+                <label class="check-line">
+                  <input
+                    type="radio"
+                    class="form-check-input"
+                    [name]="f.key"
+                    [checked]="(draft()[f.key] ?? f.options[0]) === o"
+                    (change)="setRadio(f.key, o)"
+                  />
+                  {{ o }}
+                </label>
+              }
+            </div>
+          }
+          @case ('range') {
+            <div class="range-row">
+              <input
+                type="number"
+                class="form-control form-control-sm"
+                placeholder="Min"
+                [value]="rangeVal(f.key, 'min')"
+                (input)="setRange(f.key, 'min', $any($event.target).value)"
+              />
+              <span>–</span>
+              <input
+                type="number"
+                class="form-control form-control-sm"
+                placeholder="Max"
+                [value]="rangeVal(f.key, 'max')"
+                (input)="setRange(f.key, 'max', $any($event.target).value)"
+              />
+            </div>
+            <input
+              type="range"
+              class="form-range"
+              [min]="f.min"
+              [max]="f.max"
+              [value]="rangeVal(f.key, 'min') || f.min"
+              (input)="setRange(f.key, 'min', $any($event.target).value)"
+            />
+            <input
+              type="range"
+              class="form-range"
+              [min]="f.min"
+              [max]="f.max"
+              [value]="rangeVal(f.key, 'max') || f.max"
+              (input)="setRange(f.key, 'max', $any($event.target).value)"
+            />
+          }
+        }
+      </div>
+    }
+  </div>
+
+  <div class="dialog-footer">
+    <button type="button" class="btn btn-link text-muted me-auto" (click)="clear()">
+      Clear all
+    </button>
+    <button type="button" class="btn btn-outline-secondary" (click)="closed.emit()">Cancel</button>
+    <button type="button" class="btn btn-navy" (click)="apply()">Apply</button>
+  </div>
+</div>

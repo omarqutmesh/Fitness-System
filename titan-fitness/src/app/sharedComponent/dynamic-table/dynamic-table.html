@@ -1,0 +1,71 @@
+<table class="table data-table mb-0">
+  <thead>
+    <tr>
+      @for (c of columns(); track c.key) {
+        <th
+          [class]="hideClass(c)"
+          [class.sortable]="c.sortable"
+          (click)="c.sortable && sortChange.emit(c.key)"
+        >
+          {{ c.label }}
+          @if (c.sortable && sortKey() === c.key) {
+            <i
+              class="bi ms-1"
+              [class.bi-caret-up-fill]="sortDir() === 'asc'"
+              [class.bi-caret-down-fill]="sortDir() === 'desc'"
+            ></i>
+          }
+        </th>
+      }
+      <th class="text-end">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (r of rows(); track r[idKey()]) {
+      <tr>
+        @for (c of columns(); track c.key) {
+          <td [class]="hideClass(c)">
+            @switch (c.type) {
+              @case ('name') {
+                <a class="name-cell" (click)="view.emit(r)">
+                  <span class="initials">{{ initials(text(r, c)) }}</span>
+                  <span [innerHTML]="text(r, c) | highlight: search.term()"></span>
+                </a>
+              }
+              @case ('link') {
+                <a class="name-cell" (click)="view.emit(r)">
+                  <span [innerHTML]="text(r, c) | highlight: search.term()"></span>
+                </a>
+              }
+              @case ('badge') {
+                <app-status-badge [status]="text(r, c)" />
+              }
+              @default {
+                <span [innerHTML]="text(r, c) | highlight: search.term()"></span>
+              }
+            }
+          </td>
+        }
+        <td class="text-end">
+          <div class="row-menu-wrap" (appClickOutside)="openId() === r[idKey()] && close()">
+            <button type="button" class="menu-toggle" (click)="toggle(r[idKey()])">
+              <i class="bi bi-three-dots-vertical"></i>
+            </button>
+            @if (openId() === r[idKey()]) {
+              <div class="row-menu">
+                <button type="button" (click)="pick('view', r)">{{ viewLabel() }}</button>
+                <button type="button" (click)="pick('edit', r)">{{ editLabel() }}</button>
+              </div>
+            }
+          </div>
+        </td>
+      </tr>
+    } @empty {
+      <tr>
+        <td [attr.colspan]="columns().length + 1" class="text-center text-muted py-4">
+          No results found.
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>

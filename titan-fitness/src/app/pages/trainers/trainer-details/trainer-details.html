@@ -1,0 +1,29 @@
+@if (notFound()) {
+  <div class="text-center py-5">
+    <h1 class="page-title">Trainer not found</h1>
+    <a routerLink="/trainers" class="btn btn-navy mt-2">Back to list</a>
+  </div>
+} @else {
+  <a routerLink="/trainers" class="back-link"><i class="bi bi-arrow-left me-1"></i>Back to list</a>
+
+  <div class="mb-4 mt-2">
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <h1 class="page-title mb-0">{{ mode() === 'add' ? 'New Trainer' : 'Trainer Details' }}</h1>
+      <span [class]="'mode-badge mode-' + mode()">{{ modeLabel() }}</span>
+    </div>
+    <p class="page-subtitle mb-0">{{ subtitle() }}</p>
+  </div>
+
+  <app-dynamic-form [fields]="fields" [values]="values()" [mode]="mode()" />
+
+  <div class="form-actions">
+    @if (mode() === 'view') {
+      <button type="button" class="btn btn-navy" (click)="startEdit()">Edit Trainer</button>
+    } @else {
+      <button type="button" class="btn btn-outline-secondary" (click)="cancel()">Cancel</button>
+      <button type="button" class="btn btn-navy" (click)="save()">
+        {{ mode() === 'add' ? 'Save Trainer' : 'Save Changes' }}
+      </button>
+    }
+  </div>
+}

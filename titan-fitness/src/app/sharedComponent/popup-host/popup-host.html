@@ -1,0 +1,30 @@
+<div class="toast-stack">
+  @for (t of popup.toasts(); track t.id) {
+    <div [class]="'toast-item toast-' + t.type">
+      <span>{{ t.text }}</span>
+      <button
+        type="button"
+        class="btn-close btn-close-white"
+        (click)="popup.dismiss(t.id)"
+      ></button>
+    </div>
+  }
+</div>
+
+@if (popup.confirmState(); as c) {
+  <div class="dialog-backdrop top" (click)="popup.answer(false)"></div>
+  <div class="dialog-box confirm card top">
+    <div class="dialog-body">
+      <h5 class="mb-2">{{ c.title }}</h5>
+      <p class="text-muted mb-0">{{ c.message }}</p>
+    </div>
+    <div class="dialog-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="popup.answer(false)">
+        Cancel
+      </button>
+      <button type="button" class="btn btn-navy" (click)="popup.answer(true)">
+        {{ c.confirmText }}
+      </button>
+    </div>
+  </div>
+}

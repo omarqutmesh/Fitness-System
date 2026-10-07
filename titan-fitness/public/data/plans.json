@@ -1,0 +1,79 @@
+[
+  {
+    "id": 1,
+    "name": "Monthly Basic",
+    "price": 49,
+    "duration": 1,
+    "freezeDays": 0,
+    "maxFreezes": 0,
+    "guestPasses": 0,
+    "access": "Home branch only",
+    "isPublished": true
+  },
+  {
+    "id": 2,
+    "name": "Quarterly Plus",
+    "price": 129,
+    "duration": 3,
+    "freezeDays": 30,
+    "maxFreezes": 1,
+    "guestPasses": 2,
+    "access": "Home branch only",
+    "isPublished": true
+  },
+  {
+    "id": 3,
+    "name": "Annual Pro",
+    "price": 899,
+    "duration": 12,
+    "freezeDays": 60,
+    "maxFreezes": 3,
+    "guestPasses": 5,
+    "access": "All branches",
+    "isPublished": true
+  },
+  {
+    "id": 4,
+    "name": "Student Special",
+    "price": 29,
+    "duration": 1,
+    "freezeDays": 0,
+    "maxFreezes": 0,
+    "guestPasses": 0,
+    "access": "Home branch only",
+    "isPublished": false
+  },
+  {
+    "id": 5,
+    "name": "Semi-Annual Flex",
+    "price": 449,
+    "duration": 6,
+    "freezeDays": 45,
+    "maxFreezes": 2,
+    "guestPasses": 3,
+    "access": "All branches",
+    "isPublished": true
+  },
+  {
+    "id": 6,
+    "name": "Annual Basic",
+    "price": 499,
+    "duration": 12,
+    "freezeDays": 30,
+    "maxFreezes": 1,
+    "guestPasses": 1,
+    "access": "Home branch only",
+    "isPublished": false
+  },
+  {
+    "id": 7,
+    "name": "Quarterly Basic",
+    "price": 99,
+    "duration": 3,
+    "freezeDays": 0,
+    "maxFreezes": 0,
+    "guestPasses": 0,
+    "access": "Home branch only",
+    "isPublished": true
+  }
+]

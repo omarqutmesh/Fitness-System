@@ -1,0 +1,194 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Class Schedule</h1>
+    <p class="page-subtitle">
+      @if (isToday()) {
+        Manage and monitor today's sessions.
+      } @else {
+        Sessions for {{ date() | date: 'MMM d, y' }}
+      }
+    </p>
+  </div>
+
+  <div class="toolbar">
+    <select class="form-select" [ngModel]="branch()" (ngModelChange)="branch.set($event)">
+      <option value="All">All Branches</option>
+      @for (b of header.names(); track b) {
+        <option [value]="b">{{ b }}</option>
+      }
+    </select>
+
+    <div class="date-nav">
+      <button type="button" class="btn btn-outline-secondary" (click)="shift(-1)">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+      <input
+        type="date"
+        class="form-control"
+        [ngModel]="date()"
+        (ngModelChange)="date.set($event)"
+      />
+      <button type="button" class="btn btn-outline-secondary" (click)="shift(1)">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+
+    <div class="toggle-group">
+      <button
+        type="button"
+        class="toggle-btn sm"
+        [class.active]="view() === 'day'"
+        (click)="view.set('day')"
+      >
+        Day
+      </button>
+      <button
+        type="button"
+        class="toggle-btn sm"
+        [class.active]="view() === 'week'"
+        (click)="view.set('week')"
+      >
+        Week
+      </button>
+    </div>
+
+    <button type="button" class="btn btn-navy" (click)="add()">Add Class</button>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-12 col-lg-8">
+    <div class="card">
+      <div class="card-header-row">
+        <h6 class="mb-0">{{ isToday() && view() === 'day' ? "Today's Sessions" : 'Sessions' }}</h6>
+        <span class="count-badge"
+          >{{ visible().length }} {{ visible().length === 1 ? 'Class' : 'Classes' }}</span
+        >
+      </div>
+
+      @if (svc.failed()) {
+        <div class="p-4 text-center">
+          <p class="text-muted">We couldn't load the classes.</p>
+          <button type="button" class="btn btn-navy" (click)="load()">Retry</button>
+        </div>
+      } @else if (svc.loading()) {
+        <div class="p-4 text-center text-muted">Loading...</div>
+      }
+
+      @for (g of groups(); track g.day) {
+        @if (view() === 'week') {
+          <div class="day-header">{{ g.day | date: 'EEEE, MMM d' }}</div>
+        }
+
+        @for (c of g.items; track c.id) {
+          @let t = parts(c.startTime);
+          @let s = stateOf(c);
+          <div class="session-row" [class.is-active]="s === 'active'">
+            <div class="time-block">
+              <strong>{{ t.time }}</strong>
+              <small>{{ t.period }}</small>
+            </div>
+
+            <div class="session-info">
+              <div class="session-name" role="button" (click)="open('view', c)">
+                <span [innerHTML]="c.name | highlight: search.term()"></span>
+                @if (percent(c) >= 90 && s !== 'cancelled') {
+                  <span class="hot-dot"></span>
+                }
+              </div>
+              <div class="session-meta">
+                <span
+                  ><i class="bi bi-person"></i>
+                  <span [innerHTML]="c.trainer | highlight: search.term()"></span
+                ></span>
+                <span
+                  ><i class="bi bi-geo-alt"></i>
+                  <span [innerHTML]="c.studio | highlight: search.term()"></span
+                ></span>
+                @if (branch() === 'All') {
+                  <span><i class="bi bi-building"></i> {{ c.branch }}</span>
+                }
+                <span class="duration">{{ c.startTime }} – {{ endTime(c) }}</span>
+              </div>
+            </div>
+
+            <div class="session-side">
+              <span [class]="'state-badge state-' + s">{{ labels[s] }}</span>
+
+              <div class="fill">
+                <strong>{{ c.enrolled }} / {{ c.capacity }}</strong>
+                <div class="fill-bar">
+                  <span
+                    [class.high]="percent(c) >= 90 && c.enrolled < c.capacity"
+                    [class.full]="c.enrolled >= c.capacity"
+                    [style.width.%]="percent(c)"
+                  ></span>
+                </div>
+                @if (c.enrolled >= c.capacity && c.waitlist > 0) {
+                  <small class="text-muted">Waitlist: {{ c.waitlist }}</small>
+                }
+              </div>
+
+              <div class="row-menu-wrap" (appClickOutside)="openId() === c.id && closeMenu()">
+                <button type="button" class="menu-toggle" (click)="toggleMenu(c.id)">
+                  <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                @if (openId() === c.id) {
+                  <div class="row-menu">
+                    <button type="button" (click)="open('view', c)">View Class</button>
+                    <button type="button" (click)="open('edit', c)">Edit Class</button>
+                    <button
+                      type="button"
+                      [disabled]="!canBook(c)"
+                      [title]="canBook(c) ? '' : bookHint(c)"
+                      (click)="book(c)"
+                    >
+                      Book Session
+                    </button>
+                    <button
+                      type="button"
+                      [disabled]="s === 'cancelled' || s === 'completed'"
+                      (click)="cancelClass(c)"
+                    >
+                      Cancel Class
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        } @empty {
+          @if (view() === 'day') {
+            <p class="text-muted text-center py-4 mb-0">No classes found.</p>
+          } @else {
+            <p class="text-muted small px-3 py-2 mb-0">No classes.</p>
+          }
+        }
+      }
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-4">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="mb-3">Capacity Overview</h5>
+        <div class="row g-2">
+          <div class="col-6">
+            <div class="mini-stat">
+              <i class="bi bi-people"></i>
+              <div class="mini-value">{{ totalBookings() }}</div>
+              <small class="text-muted">Total Bookings</small>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="mini-stat">
+              <i class="bi bi-clipboard-check"></i>
+              <div class="mini-value">{{ avgFill() }}%</div>
+              <small class="text-muted">Avg Fill Rate</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

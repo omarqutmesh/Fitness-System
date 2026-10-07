@@ -1,0 +1,11 @@
+@switch (dialog.state()?.kind) {
+  @case ('member') {
+    <app-member-dialog />
+  }
+  @case ('class') {
+    <app-class-dialog />
+  }
+  @case ('checkin') {
+    <app-checkin-dialog />
+  }
+}

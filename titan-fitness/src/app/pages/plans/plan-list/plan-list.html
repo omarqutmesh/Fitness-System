@@ -1,0 +1,55 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Plan Catalogue</h1>
+    <p class="page-subtitle">Manage and view all membership plans.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <button type="button" class="btn btn-outline-secondary" (click)="filterOpen.set(true)">
+      <i class="bi bi-funnel me-1"></i>Filter
+      @if (activeCount()) {
+        <span class="filter-count">{{ activeCount() }}</span>
+      }
+    </button>
+    <a routerLink="/plans/new" class="btn btn-navy"><i class="bi bi-plus-lg me-1"></i>Add Plan</a>
+  </div>
+</div>
+
+<div class="card">
+  @if (svc.failed()) {
+    <div class="p-4 text-center">
+      <p class="text-muted">We couldn't load the plans.</p>
+      <button type="button" class="btn btn-navy" (click)="load()">Retry</button>
+    </div>
+  } @else if (svc.loading()) {
+    <div class="p-4 text-center text-muted">Loading...</div>
+  } @else {
+    <app-dynamic-table
+      [columns]="columns"
+      [rows]="rows()"
+      [sortKey]="state().sortKey"
+      [sortDir]="state().sortDir"
+      viewLabel="View Plan"
+      editLabel="Update Plan"
+      (sortChange)="sort($event)"
+      (view)="view($event)"
+      (edit)="edit($event)"
+    />
+
+    <app-paginator
+      [total]="total()"
+      [pageSize]="pageSize"
+      [page]="state().page"
+      (pageChange)="set({ page: $event })"
+    />
+  }
+</div>
+
+@if (filterOpen()) {
+  <app-filter-dialog
+    title="Filter Plans"
+    [filters]="filterConfig()"
+    [value]="filterValue()"
+    (filtersApplied)="apply($event)"
+    (closed)="filterOpen.set(false)"
+  />
+}

@@ -1,0 +1,13 @@
+<div class="dialog-backdrop" (click)="closed.emit()"></div>
+<div class="dialog-box card" [class.wide]="wide()">
+  <div class="card-header-row">
+    <h5 class="mb-0">{{ title() }}</h5>
+    <button type="button" class="btn-close" (click)="closed.emit()"></button>
+  </div>
+  <div class="dialog-body">
+    <ng-content />
+  </div>
+  <div class="dialog-footer">
+    <ng-content select="[footer]" />
+  </div>
+</div>

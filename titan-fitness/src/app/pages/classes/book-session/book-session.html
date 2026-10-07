@@ -1,0 +1,100 @@
+@if (cls(); as c) {
+  <a routerLink="/classes" class="back-link"
+    ><i class="bi bi-arrow-left me-1"></i>Back to Class Schedule</a
+  >
+  <h1 class="page-title">Book Session</h1>
+  <p class="page-subtitle mb-4">Reserve a spot for a member.</p>
+
+  <div class="card booking-card">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+        <div>
+          <h4 class="class-title">{{ c.name }}</h4>
+          <div class="session-meta">
+            <span
+              ><i class="bi bi-clock"></i> {{ c.date }}, {{ c.startTime }} - {{ endTime(c) }}</span
+            >
+            <span><i class="bi bi-person"></i> Trainer: {{ c.trainer }}</span>
+            <span><i class="bi bi-geo-alt"></i> {{ c.studio }}</span>
+          </div>
+        </div>
+        <span class="count-badge"
+          ><i class="bi bi-people me-1"></i>{{ c.capacity - c.enrolled }} / {{ c.capacity }} spots
+          remaining</span
+        >
+      </div>
+
+      @if (closedReason()) {
+        <div class="alert alert-warning mt-3 mb-0">{{ closedReason() }}</div>
+      }
+
+      <hr />
+
+      <label class="form-label fw-semibold">Select Member</label>
+      <div class="search-box mb-2">
+        <i class="bi bi-search"></i>
+        <input
+          type="search"
+          class="form-control"
+          placeholder="Search by name or ID..."
+          [disabled]="!!closedReason()"
+          [ngModel]="term()"
+          (ngModelChange)="term.set($event)"
+        />
+      </div>
+
+      @for (m of results(); track m.id) {
+        <button
+          type="button"
+          class="member-pick"
+          [class.selected]="selected()?.id === m.id"
+          [disabled]="!!closedReason()"
+          (click)="selected.set(m)"
+        >
+          <span class="initials">{{ initials(m.name) }}</span>
+          <span class="text-start flex-grow-1">
+            <strong class="d-block" [innerHTML]="m.name | highlight: term()"></strong>
+            <small class="text-muted"
+              >ID: #<span [innerHTML]="m.id | highlight: term()"></span
+            ></small>
+          </span>
+          <app-status-badge [status]="m.status" />
+        </button>
+      } @empty {
+        <p class="text-muted small">No active members match your search.</p>
+      }
+
+      <div class="mt-3">
+        <label class="form-label fw-semibold"
+          >Special Requirements / Notes <span class="text-muted fw-normal">(Optional)</span></label
+        >
+        <textarea
+          class="form-control"
+          rows="3"
+          maxlength="250"
+          placeholder="e.g., Recovering from mild shoulder injury"
+          [disabled]="!!closedReason()"
+          [ngModel]="notes()"
+          (ngModelChange)="notes.set($event)"
+        ></textarea>
+      </div>
+
+      <div class="d-flex justify-content-end gap-2 mt-4">
+        <button type="button" class="btn btn-outline-secondary" (click)="cancel()">Cancel</button>
+        <button
+          type="button"
+          class="btn btn-navy"
+          [disabled]="!selected() || !!closedReason()"
+          (click)="confirm()"
+        >
+          Confirm Booking
+        </button>
+      </div>
+    </div>
+  </div>
+} @else if (!loading()) {
+  <div class="text-center py-5">
+    <h1 class="page-title">Class not found</h1>
+    <a routerLink="/classes" class="btn btn-navy mt-2">Back to Classes</a>
+  </div>
+}

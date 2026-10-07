@@ -1,0 +1,49 @@
+<app-modal [title]="title()" [wide]="true" (closed)="cancel()">
+  <app-dynamic-form
+    [fields]="fields()"
+    [values]="values()"
+    [mode]="mode()"
+    [lock]="lock()"
+    [plain]="true"
+  />
+
+  <div class="readonly-line mt-3">
+    <span>Status</span>
+    @if (state(); as s) {
+      <span [class]="'state-badge state-' + s">{{ labels[s] }}</span>
+    } @else {
+      <span class="state-badge state-active">Active (Booking Open)</span>
+    }
+  </div>
+
+  @if (cls(); as c) {
+    <small class="text-muted d-block">
+      {{ c.enrolled }} / {{ c.capacity }} enrolled
+      @if (c.waitlist > 0) {
+        · Waitlist: {{ c.waitlist }}
+      }
+      @if (lock().length) {
+        · Branch is locked because the class has bookings
+      }
+    </small>
+  }
+
+  <ng-container ngProjectAs="[footer]">
+    @switch (mode()) {
+      @case ('view') {
+        <button type="button" class="btn btn-outline-secondary" (click)="close()">Close</button>
+        <button type="button" class="btn btn-navy" (click)="edit()">Edit</button>
+      }
+      @case ('edit') {
+        <button type="button" class="btn btn-outline-secondary" (click)="cancel()">Cancel</button>
+        <button type="button" class="btn btn-navy" (click)="save()">Save Changes</button>
+      }
+      @default {
+        <button type="button" class="btn btn-outline-secondary" (click)="cancel()">Cancel</button>
+        <button type="button" class="btn btn-navy" (click)="save()">
+          <i class="bi bi-calendar-plus me-1"></i>Schedule Class
+        </button>
+      }
+    }
+  </ng-container>
+</app-modal>

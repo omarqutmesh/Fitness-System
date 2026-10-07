@@ -1,0 +1,124 @@
+<div class="member-shell">
+  <div class="member-bar">
+    <button type="button" class="btn btn-outline-secondary btn-sm" (click)="back()">
+      <i class="bi bi-arrow-left"></i>
+    </button>
+    <h1>Class Booking</h1>
+    @if (member(); as m) {
+      <span class="member-chip" [class.off]="m.status !== 'Active'">
+        <i class="bi bi-circle-fill"></i> {{ m.status }} Member
+      </span>
+    }
+  </div>
+
+  <div class="member-body">
+    @if (cls(); as c) {
+      <div class="crumbs">
+        <a routerLink="/classes">Classes</a>
+        <i class="bi bi-chevron-right"></i>
+        <span>Booking</span>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          @if (booked()) {
+            <div class="success-box">
+              <i class="bi bi-check-circle-fill"></i>
+              <h4>You're booked!</h4>
+              <p class="text-muted mb-3">{{ c.name }} · {{ when() }}</p>
+              <a routerLink="/classes" class="btn btn-navy">Back to Classes</a>
+            </div>
+          } @else {
+            <h3 class="class-title">{{ c.name }}</h3>
+            <div class="session-meta mb-3">
+              <span><i class="bi bi-clock"></i> {{ when() }}</span>
+            </div>
+            <div class="session-meta pb-3 border-bottom">
+              <span
+                ><i class="bi bi-person"></i> Trainer: {{ c.trainer || 'To be announced' }}</span
+              >
+              <span
+                ><i class="bi bi-door-open"></i> Studio: {{ c.studio || 'To be announced' }}</span
+              >
+            </div>
+
+            <div class="row g-3 mt-1">
+              <div class="col-12 col-sm-6">
+                <div class="info-box">
+                  <small class="info-label">Availability</small>
+                  <div>
+                    <span class="big">{{ spotsLeft() }}</span> spots left ({{ c.enrolled }}/{{
+                      c.capacity
+                    }}
+                    booked)
+                  </div>
+                  <div class="fill-bar mt-2"><span [style.width.%]="percent()"></span></div>
+                </div>
+              </div>
+              <div class="col-12 col-sm-6">
+                <div class="info-box">
+                  <small class="info-label">Eligibility status</small>
+                  <div class="eligible" [class.bad]="problem()">
+                    <span class="tick"
+                      ><i
+                        class="bi"
+                        [class.bi-check-lg]="!problem()"
+                        [class.bi-x-lg]="problem()"
+                      ></i
+                    ></span>
+                    <div>
+                      @if (problem()) {
+                        <strong>Not eligible</strong>
+                        <small class="d-block text-muted">{{ problem() }}</small>
+                      } @else {
+                        <strong>Active Membership</strong>
+                        <small class="d-block text-muted">Cleared for booking</small>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <label class="form-label fw-semibold"
+                >Notes for the Trainer <span class="text-muted fw-normal">(Optional)</span></label
+              >
+              <small class="text-muted d-block mb-2"
+                >Include any injuries, required modifications, or equipment needs.</small
+              >
+              <textarea
+                class="form-control"
+                rows="3"
+                maxlength="250"
+                placeholder="e.g., Recovering from mild shoulder strain, need alternative exercises."
+                [disabled]="!!problem()"
+                [ngModel]="notes()"
+                (ngModelChange)="notes.set($event)"
+              ></textarea>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mt-4">
+              <button type="button" class="btn btn-outline-secondary" (click)="back()">
+                Cancel
+              </button>
+              <button
+                type="button"
+                class="btn btn-navy"
+                [disabled]="!!problem()"
+                (click)="confirm()"
+              >
+                Confirm Booking <i class="bi bi-check-lg ms-1"></i>
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    } @else if (!loading()) {
+      <div class="text-center py-5">
+        <h1 class="page-title">Class not found</h1>
+        <a routerLink="/classes" class="btn btn-navy mt-2">Back to Classes</a>
+      </div>
+    }
+  </div>
+</div>

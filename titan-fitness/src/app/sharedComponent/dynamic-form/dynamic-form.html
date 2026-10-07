@@ -1,0 +1,109 @@
+<form [formGroup]="group()" (submit)="$event.preventDefault()" novalidate>
+  @for (s of sections(); track s.title) {
+    <div [class]="plain() ? 'mb-2' : 'card mb-3'">
+      @if (!plain()) {
+        <div class="card-header-row">
+          <h5 class="mb-0">{{ s.title }}</h5>
+        </div>
+      }
+      <div [class.card-body]="!plain()">
+        <div class="row g-3">
+          @for (f of s.fields; track f.key) {
+            <div
+              [class]="
+                f.full ? 'col-12' : f.width === 'third' ? 'col-12 col-md-4' : 'col-12 col-md-6'
+              "
+            >
+              @if (f.type === 'checkbox') {
+                <label class="form-label d-block">Status</label>
+                <div class="form-check">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    [id]="f.key"
+                    [formControlName]="f.key"
+                  />
+                  <label class="form-check-label" [for]="f.key">{{ f.label }}</label>
+                </div>
+                @if (f.hint && mode() !== 'view') {
+                  <small class="text-muted">{{ f.hint }}</small>
+                }
+              } @else {
+                <label class="form-label" [for]="f.key">
+                  {{ f.label }}
+                  @if (f.required) {
+                    <span class="req">*</span>
+                  }
+                </label>
+
+                @switch (f.type) {
+                  @case ('select') {
+                    <select
+                      class="form-select"
+                      [id]="f.key"
+                      [formControlName]="f.key"
+                      [class.is-invalid]="error(f)"
+                    >
+                      <option value="">{{ f.placeholder ?? 'Select' }}</option>
+                      @for (o of f.options; track o) {
+                        <option [value]="o">{{ o }}</option>
+                      }
+                    </select>
+                  }
+                  @case ('radio') {
+                    <div class="radio-cards">
+                      @for (o of f.options; track o) {
+                        <label
+                          class="radio-card"
+                          [class.selected]="group().get(f.key)?.value === o"
+                          [class.disabled]="group().get(f.key)?.disabled"
+                        >
+                          <input type="radio" [value]="o" [formControlName]="f.key" />
+                          {{ o }}
+                        </label>
+                      }
+                    </div>
+                  }
+                  @case ('textarea') {
+                    <textarea
+                      class="form-control"
+                      rows="3"
+                      [id]="f.key"
+                      [formControlName]="f.key"
+                      [placeholder]="f.placeholder ?? ''"
+                      [class.is-invalid]="error(f)"
+                    ></textarea>
+                  }
+                  @case ('number') {
+                    <input
+                      type="number"
+                      class="form-control"
+                      [id]="f.key"
+                      [formControlName]="f.key"
+                      [placeholder]="f.placeholder ?? ''"
+                      [class.is-invalid]="error(f)"
+                    />
+                  }
+                  @default {
+                    <input
+                      [type]="f.type"
+                      class="form-control"
+                      [id]="f.key"
+                      [formControlName]="f.key"
+                      [placeholder]="f.placeholder ?? ''"
+                      [class.is-invalid]="error(f)"
+                    />
+                  }
+                }
+              }
+
+              @if (error(f)) {
+                <div class="invalid-feedback d-block">{{ error(f) }}</div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</form>

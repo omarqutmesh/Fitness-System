@@ -1,0 +1,110 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Member Directory</h1>
+    <p class="page-subtitle">Manage and view all registered members.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <button type="button" class="btn btn-outline-secondary" (click)="filterOpen.set(true)">
+      <i class="bi bi-funnel me-1"></i>Filter
+      @if (activeCount()) {
+        <span class="filter-count">{{ activeCount() }}</span>
+      }
+    </button>
+    <button type="button" class="btn btn-navy" (click)="add()">
+      <i class="bi bi-plus-lg me-1"></i>Add Member
+    </button>
+  </div>
+</div>
+
+<div class="card">
+  @if (svc.failed()) {
+    <div class="p-4 text-center">
+      <p class="text-muted">We couldn't load the members.</p>
+      <button type="button" class="btn btn-navy" (click)="load()">Retry</button>
+    </div>
+  } @else if (svc.loading()) {
+    <div class="p-4 text-center text-muted">Loading...</div>
+  } @else {
+    <table class="table data-table mb-0">
+      <thead>
+        <tr>
+          <th>Member Name</th>
+          <th class="d-none d-sm-table-cell">ID</th>
+          <th>Status</th>
+          <th class="d-none d-md-table-cell">Branch</th>
+          <th class="d-none d-lg-table-cell">Last Visit</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (m of rows(); track m.id) {
+          <tr>
+            <td>
+              <a class="name-cell" (click)="view(m)">
+                <span class="initials">{{ initials(m.name) }}</span>
+                <span [innerHTML]="m.name | highlight: search.term()"></span>
+              </a>
+            </td>
+            <td class="d-none d-sm-table-cell">
+              <span [innerHTML]="'#' + m.id | highlight: search.term()"></span>
+            </td>
+            <td><app-status-badge [status]="m.status" /></td>
+            <td class="d-none d-md-table-cell">
+              <span [innerHTML]="m.branch | highlight: search.term()"></span>
+            </td>
+            <td class="d-none d-lg-table-cell">{{ visit(m.lastVisit) }}</td>
+            <td class="text-end">
+              <div class="row-menu-wrap" (appClickOutside)="openId() === m.id && closeMenu()">
+                <button type="button" class="menu-toggle" (click)="toggleMenu(m.id)">
+                  <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                @if (openId() === m.id) {
+                  <div class="row-menu">
+                    <button type="button" (click)="view(m)">View Profile</button>
+                    <button
+                      type="button"
+                      [disabled]="!canCheckIn(m)"
+                      [title]="canCheckIn(m) ? '' : 'Membership is ' + m.status"
+                      (click)="checkIn(m)"
+                    >
+                      Check-In
+                    </button>
+                    <button
+                      type="button"
+                      [disabled]="!canFreeze(m)"
+                      [title]="canFreeze(m) ? '' : freezeHint(m)"
+                      (click)="freeze(m)"
+                    >
+                      Freeze Membership
+                    </button>
+                  </div>
+                }
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="text-center text-muted py-4">No members found.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <app-paginator
+      [total]="total()"
+      [pageSize]="pageSize"
+      [page]="state().page"
+      (pageChange)="set({ page: $event })"
+    />
+  }
+</div>
+
+@if (filterOpen()) {
+  <app-filter-dialog
+    title="Filter Members"
+    [filters]="filterConfig()"
+    [value]="filterValue()"
+    (filtersApplied)="apply($event)"
+    (closed)="filterOpen.set(false)"
+  />
+}

@@ -1,0 +1,66 @@
+<div class="app-shell">
+  <aside class="sidebar" [class.open]="menuOpen()">
+    <div class="brand">
+      <i class="bi bi-lightning-charge-fill"></i>
+      <div>
+        <div class="brand-name">Titan Fitness</div>
+        <small>Staff Portal</small>
+      </div>
+    </div>
+
+    <div class="px-3 mb-3">
+      <button type="button" class="btn btn-light w-100 fw-semibold" (click)="newCheckIn()">
+        <i class="bi bi-plus-lg me-1"></i> New Check-in
+      </button>
+    </div>
+
+    <nav>
+      @for (l of links; track l.path) {
+        <a [routerLink]="l.path" routerLinkActive="active" (click)="close()">
+          <i class="bi {{ l.icon }} me-2"></i>{{ l.label }}
+        </a>
+      }
+    </nav>
+  </aside>
+
+  @if (menuOpen()) {
+    <div class="sidebar-backdrop" (click)="close()"></div>
+  }
+
+  <div class="main-area">
+    <header class="topbar">
+      <button type="button" class="btn btn-outline-secondary menu-btn" (click)="toggle()">
+        <i class="bi bi-list"></i>
+      </button>
+
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input
+          type="search"
+          class="form-control"
+          placeholder="Search..."
+          [value]="search.term()"
+          (input)="search.set($any($event.target).value)"
+        />
+      </div>
+
+      <div class="topbar-right">
+        <select
+          class="form-select form-select-sm branch-select"
+          (change)="branch.set($any($event.target).value)"
+        >
+          @for (b of branch.names(); track b) {
+            <option [value]="b" [selected]="b === branch.current()">{{ b }} Branch</option>
+          }
+        </select>
+        <i class="bi bi-bell"></i>
+        <i class="bi bi-calendar3"></i>
+        <span class="avatar">AD</span>
+      </div>
+    </header>
+
+    <main class="content-area">
+      <router-outlet />
+    </main>
+  </div>
+</div>

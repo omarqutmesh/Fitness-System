@@ -1,0 +1,100 @@
+<h1 class="page-title">Dashboard</h1>
+<p class="page-subtitle mb-4">Live floor statistics and quick actions.</p>
+
+<div class="row g-3">
+  <div class="col-12 col-xl-8">
+    <div class="row g-3 mb-3">
+      <div class="col-12 col-sm-6">
+        <div class="card stat-card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <span class="stat-label">Check-ins today</span>
+              <i class="bi bi-person-check text-primary-navy"></i>
+            </div>
+            <div class="stat-value">{{ checkInsToday() }}</div>
+            <small class="text-muted">{{ checkInsLastWeek() }} on the same day last week</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-sm-6">
+        <div class="card stat-card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <span class="stat-label">Active members</span>
+              <i class="bi bi-people text-primary-navy"></i>
+            </div>
+            <div class="stat-value">{{ activeMembers() | number }}</div>
+            <small class="text-muted">Currently on floor: {{ onFloor() }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header-row">
+        <h5 class="mb-0">Upcoming Classes</h5>
+        <div class="d-flex align-items-center gap-3">
+          <select
+            class="form-select form-select-sm class-filter"
+            [value]="stateFilter()"
+            (change)="stateFilter.set($any($event.target).value)"
+          >
+            @for (o of stateOptions; track o.value) {
+              <option [value]="o.value">{{ o.label }}</option>
+            }
+          </select>
+          <a routerLink="/classes" class="link-navy">View Schedule</a>
+        </div>
+      </div>
+
+      @if (classSvc.failed()) {
+        <div class="p-4 text-center">
+          <p class="text-muted">We couldn't load the classes.</p>
+          <button type="button" class="btn btn-navy" (click)="load()">Retry</button>
+        </div>
+      } @else if (classSvc.loading()) {
+        <p class="text-muted p-3 mb-0">Loading...</p>
+      } @else {
+        @for (x of upcoming(); track x.c.id) {
+          @let t = parts(x.c.startTime);
+          <div class="class-row">
+            <div class="class-time">
+              <strong>{{ t.time }}</strong>
+              <small>{{ t.period }}</small>
+            </div>
+            <div class="class-info">
+              <div class="class-name" [innerHTML]="x.c.name | highlight: search.term()"></div>
+              <small class="text-muted">
+                <span [innerHTML]="x.c.studio | highlight: search.term()"></span> •
+                <span [innerHTML]="x.c.trainer | highlight: search.term()"></span>
+              </small>
+            </div>
+            <div class="class-side">
+              <small class="text-muted">{{ x.c.enrolled }}/{{ x.c.capacity }} Enrolled</small>
+              <span [class]="'state-badge state-' + x.state">{{ labels[x.state] }}</span>
+            </div>
+          </div>
+        } @empty {
+          <p class="text-muted p-3 mb-0">No classes found.</p>
+        }
+      }
+    </div>
+  </div>
+
+  <div class="col-12 col-xl-4">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="mb-3">Quick Actions</h5>
+        @for (a of quickActions; track a.title) {
+          <button type="button" class="quick-action" (click)="a.run()">
+            <span class="quick-icon"><i class="bi {{ a.icon }}"></i></span>
+            <span class="text-start">
+              <strong class="d-block">{{ a.title }}</strong>
+              <small class="text-muted">{{ a.text }}</small>
+            </span>
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+</div>

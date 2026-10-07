@@ -1,8 +1,15 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, inject, provideAppInitializer } from '@angular/core';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
-import { routes } from './app.routes';
+import { firstValueFrom } from 'rxjs';
+import { routes } from './routing/app.routes';
+import { BranchService } from './services/branch.service';
+import { errorInterceptor } from './services/error.interceptor';
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideBrowserGlobalErrorListeners(), provideRouter(routes), provideHttpClient()],
+  providers: [
+    provideRouter(routes),
+    provideHttpClient(withInterceptors([errorInterceptor])),
+    provideAppInitializer(() => firstValueFrom(inject(BranchService).load())),
+  ],
 };

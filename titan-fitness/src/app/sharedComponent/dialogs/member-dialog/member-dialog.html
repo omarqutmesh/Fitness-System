@@ -1,0 +1,22 @@
+<app-modal [title]="title()" (closed)="cancel()">
+  @if (member(); as m) {
+    <div class="readonly-line">
+      <span>ID: #{{ m.id }}</span>
+      <app-status-badge [status]="m.status" />
+    </div>
+  } @else {
+    <div class="readonly-line">
+      <span>Status</span>
+      <app-status-badge status="Active" />
+    </div>
+  }
+
+  <app-dynamic-form [fields]="fields()" [values]="values()" mode="add" [plain]="true" />
+
+  <ng-container ngProjectAs="[footer]">
+    <button type="button" class="btn btn-outline-secondary" (click)="cancel()">Cancel</button>
+    <button type="button" class="btn btn-navy" (click)="save()">
+      {{ isEdit() ? 'Save Changes' : 'Add Member' }}
+    </button>
+  </ng-container>
+</app-modal>

@@ -1,0 +1,120 @@
+@if (member(); as m) {
+  <div class="page-head">
+    <div class="d-flex align-items-center gap-3">
+      <button type="button" class="btn btn-outline-secondary" (click)="back()">
+        <i class="bi bi-arrow-left"></i>
+      </button>
+      <h1 class="page-title mb-0">Member Profile</h1>
+    </div>
+    <button type="button" class="btn btn-outline-secondary" (click)="dialog.editMember(m)">
+      Edit Profile
+    </button>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-12 col-lg-4">
+      <div class="card mb-3">
+        <div class="card-body text-center profile-id">
+          <div class="badge-corner"><app-status-badge [status]="m.status" /></div>
+          <div class="profile-avatar">{{ initials(m.name) }}</div>
+          <h4 class="mb-0">{{ m.name }}</h4>
+          <p class="text-muted">ID: #{{ m.id }}</p>
+          <ul class="contact-list">
+            <li><i class="bi bi-envelope"></i>{{ m.email || '—' }}</li>
+            <li><i class="bi bi-telephone"></i>{{ m.phone || '—' }}</li>
+            <li><i class="bi bi-geo-alt"></i>{{ m.address || '—' }}</li>
+            <li><i class="bi bi-calendar3"></i>Joined: {{ m.joined | date: 'MMM d, y' }}</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header-row"><h6 class="mb-0">Current Plan</h6></div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-end">
+            <div>
+              <div class="plan-name">{{ m.plan }}</div>
+              <small class="text-muted">Renews: {{ m.endDate | date: 'MMM d, y' }}</small>
+            </div>
+            <div class="text-end">
+              <strong>{{ m.price | currency: 'USD' : 'symbol' : '1.0-0' }}</strong>
+            </div>
+          </div>
+          <a
+            class="btn btn-outline-navy w-100 mt-3"
+            [class.disabled]="m.status !== 'Active' || m.freezesUsed >= m.freezesMax"
+            [routerLink]="['/members', m.id, 'freeze']"
+            >Freeze Membership</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-8">
+      <div class="row g-3 mb-3">
+        <div class="col-12 col-sm-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between mb-2">
+                <strong><i class="bi bi-snow me-2"></i>Freezes Used</strong>
+                <small>{{ m.freezesUsed }} / {{ m.freezesMax }}</small>
+              </div>
+              <div class="progress">
+                <div
+                  class="progress-bar"
+                  [style.width.%]="percent(m.freezesUsed, m.freezesMax)"
+                ></div>
+              </div>
+              <small class="text-muted d-block text-end mt-1"
+                >{{ m.freezesMax - m.freezesUsed }} freeze remaining</small
+              >
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-sm-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between mb-2">
+                <strong><i class="bi bi-person-plus me-2"></i>Guest Passes</strong>
+                <small>{{ m.guestUsed }} / {{ m.guestMax }}</small>
+              </div>
+              <div class="progress">
+                <div class="progress-bar" [style.width.%]="percent(m.guestUsed, m.guestMax)"></div>
+              </div>
+              <small class="text-muted d-block text-end mt-1"
+                >{{ m.guestMax - m.guestUsed }} passes remaining</small
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header-row">
+          <h5 class="mb-0">Recent Activity</h5>
+          <a class="link-navy">View All</a>
+        </div>
+        @for (a of activity(); track $index) {
+          <div class="activity-row">
+            <span class="activity-icon"><i class="bi {{ a.icon }}"></i></span>
+            <div class="flex-grow-1">
+              <strong class="d-block">{{ a.title }}</strong>
+              <small class="text-muted">{{ a.sub }}</small>
+            </div>
+            <div class="text-end">
+              <small class="d-block">{{ a.when }}</small>
+              <small class="text-muted">{{ a.time }}</small>
+            </div>
+          </div>
+        } @empty {
+          <p class="text-muted p-3 mb-0">No recent activity.</p>
+        }
+      </div>
+    </div>
+  </div>
+} @else if (!loading()) {
+  <div class="text-center py-5">
+    <h1 class="page-title">Member not found</h1>
+    <a routerLink="/members" class="btn btn-navy mt-2">Back to Members</a>
+  </div>
+}

@@ -1,0 +1,98 @@
+<app-modal title="New Check-in" (closed)="close()">
+  <div class="mb-3">
+    <label class="form-label">Member <span class="req">*</span></label>
+
+    @if (selected(); as m) {
+      <div class="member-pick selected">
+        <span class="initials">{{ initials(m.name) }}</span>
+        <span class="text-start flex-grow-1">
+          <strong class="d-block">{{ m.name }}</strong>
+          <small class="text-muted">ID: #{{ m.id }}</small>
+        </span>
+        <app-status-badge [status]="m.status" />
+        @if (!locked()) {
+          <button type="button" class="btn-close ms-2" (click)="clearPick()"></button>
+        }
+      </div>
+    } @else {
+      <input
+        type="search"
+        class="form-control"
+        placeholder="Search by name or ID (#TF-8932)"
+        appAutofocus
+        [ngModel]="term()"
+        (ngModelChange)="term.set($event)"
+      />
+      @for (m of results(); track m.id) {
+        <button type="button" class="member-pick mt-1" (click)="pick(m)">
+          <span class="initials">{{ initials(m.name) }}</span>
+          <span class="text-start flex-grow-1">
+            <strong class="d-block">{{ m.name }}</strong>
+            <small class="text-muted">ID: #{{ m.id }}</small>
+          </span>
+          <app-status-badge [status]="m.status" />
+        </button>
+      }
+    }
+
+    @if ((touched() || selected()) && memberError()) {
+      <div class="invalid-feedback d-block">{{ memberError() }}</div>
+    }
+  </div>
+
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-sm-6">
+      <label class="form-label">Check-in date <span class="req">*</span></label>
+      <input
+        type="date"
+        class="form-control"
+        [min]="minDate"
+        [max]="today"
+        [class.is-invalid]="dateError()"
+        [ngModel]="date()"
+        (ngModelChange)="date.set($event)"
+      />
+      @if (dateError()) {
+        <div class="invalid-feedback d-block">{{ dateError() }}</div>
+      }
+    </div>
+    <div class="col-12 col-sm-6">
+      <label class="form-label">Check-in time <span class="req">*</span></label>
+      <input
+        type="time"
+        class="form-control"
+        step="300"
+        [class.is-invalid]="timeError()"
+        [ngModel]="time()"
+        (ngModelChange)="time.set($event)"
+      />
+      @if (timeError()) {
+        <div class="invalid-feedback d-block">{{ timeError() }}</div>
+      }
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Branch</label>
+    <div class="readonly-text">{{ branch.current() }} Branch</div>
+  </div>
+
+  <div>
+    <label class="form-label">Notes <span class="text-muted">(Optional)</span></label>
+    <textarea
+      class="form-control"
+      rows="3"
+      maxlength="250"
+      [ngModel]="notes()"
+      (ngModelChange)="notes.set($event)"
+    ></textarea>
+    <small class="text-muted d-block text-end">{{ notes().length }}/250</small>
+  </div>
+
+  <ng-container ngProjectAs="[footer]">
+    <button type="button" class="btn btn-outline-secondary" (click)="close()">Cancel</button>
+    <button type="button" class="btn btn-navy" [disabled]="!valid()" (click)="save()">
+      Check In
+    </button>
+  </ng-container>
+</app-modal>
